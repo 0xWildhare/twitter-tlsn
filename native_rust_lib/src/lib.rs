@@ -13,10 +13,6 @@ use tokio::io::DuplexStream;
 use tokio::runtime::{Builder, Runtime};
 use tokio_util::compat::{FuturesAsyncReadCompatExt, TokioAsyncReadCompatExt};
 
-use jni::objects::JClass;
-use jni::sys::jString;
-use jni::JNIEnv;
-
 lazy_static! {
     pub static ref RUNTIME: Arc<Runtime> = Arc::new(
         Builder::new_multi_thread()
@@ -70,7 +66,7 @@ unsafe extern "C" fn rust_start(request: *const c_char) -> *const c_char {
 
     let result = runtime.block_on(handle).unwrap();
 
-    if (notary_handle.is_finished()) {
+    if notary_handle.is_finished() {
         println!("Notary finished");
     }
 
@@ -82,28 +78,34 @@ unsafe extern "C" fn rust_start(request: *const c_char) -> *const c_char {
 /// cbindgen:ignore
 // #[cfg(target_os = "android")]
 pub mod android {
-    use crate::rust_add;
-    use jni::objects::JClass;
-    use jni::sys::jString;
+    use crate::rust_start;
+    use jni::objects::{JClass, JString};
+    use jni::sys::jstring;
     use jni::JNIEnv;
+    use std::ffi::{CStr, CString};
 
     #[no_mangle]
     pub unsafe extern "C" fn Java_expo_modules_myrustmodule_MyRustModule_rustStart(
-        _env: JNIEnv,
+        mut _env: JNIEnv,
         _class: JClass,
-        request: jString,
-    ) -> jString {
-        let proof = rust_start(request);
+        _request: jstring,
+    ) -> jstring {
+        let input = JString::from_raw(_request);
+        let input_str: String = _env
+            .get_string(&input)
+            .expect("Couldn't get Java string!")
+            .into();
+        let request = CString::new(input_str).unwrap();
+        let proof = rust_start(request.into_raw());
         let c_str = unsafe {
-            assert!(!input.is_null());
+            assert!(!proof.is_null());
             CStr::from_ptr(proof)
         };
         let r_str = c_str.to_str().unwrap();
-        let output: jString = env
+        let output = _env
             .new_string(r_str)
             .expect("Couldn't create Java string for proof!");
-
-        output
+        jstring::from(output.into_raw())
     }
 }
 
