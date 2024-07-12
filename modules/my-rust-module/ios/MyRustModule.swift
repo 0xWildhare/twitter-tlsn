@@ -23,15 +23,15 @@ public class MyRustModule: Module {
       return "Hello world! 👋"
     }
 
-    AsyncFunction("start") { (request:String)->String in
-      let c_str = start(request) as Optional<UnsafePointer<CChar>>
+    AsyncFunction("rust_start") { (request:String)->String in
+      let c_str = rust_start(request) as Optional<UnsafePointer<CChar>>
 
 //      print("rust resp c_str from swift", c_str!)
       let val =  String(cString: c_str!)
 //    signer_destroy_string(c_str!)
       // print("rust resp from swift", val)
       return val
-    // start()
+    
     }
 
     // Defines a JavaScript function that always returns a Promise and whose native code

@@ -1,8 +1,8 @@
-import {DEFAULT_DOORDASH_HEADERS, DOORDASH_HOST, ProfileInterface} from '.';
+import { DEFAULT_DOORDASH_HEADERS, DOORDASH_HOST, ProfileInterface } from ".";
 import {
   NotarizationRequestInterface,
-  start,
-} from '../../modules/my-rust-module';
+  rust_start,
+} from "../../modules/my-rust-module";
 
 //`/v2/consumers/me/`
 
@@ -13,8 +13,8 @@ export const notarizeDoorDashRequest = (
 ): NotarizationRequestInterface => ({
   host: DOORDASH_HOST,
   path,
-  body: '',
-  headers: [['Authorization', `JWT ${token}`], ...DEFAULT_DOORDASH_HEADERS],
+  body: "",
+  headers: [["Authorization", `JWT ${token}`], ...DEFAULT_DOORDASH_HEADERS],
   redact_strings: [`JWT ${token}`, ...redactStrings],
   max_sent: 4096,
   max_recv: 32768,
@@ -50,7 +50,7 @@ export const notarizeDoorDashProfileRequest = (
 export const generateDoorDashProof = async (
   request: NotarizationRequestInterface,
 ): Promise<String> => {
-  const proof_str = await start(request);
+  const proof_str = await rust_start(request);
   const proof = JSON.parse(proof_str as string);
   return JSON.stringify(proof);
 };

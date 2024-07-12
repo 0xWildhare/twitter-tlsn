@@ -41,12 +41,12 @@ export interface NotarizationRequestInterface {
   max_recv: number;
 }
 
-export async function start(
+export async function rust_start(
   request: NotarizationRequestInterface,
 ): Promise<string> {
   console.log("Starting Rust module with request", request);
   const stringRequest = JSON.stringify(request);
-  const resp = await MyRustModule.start(stringRequest);
+  const resp = await MyRustModule.rust_start(stringRequest);
   const proof = JSON.parse(resp as string);
 
   return JSON.stringify(proof);
