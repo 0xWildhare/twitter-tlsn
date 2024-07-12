@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-rust-demo",
-    "slug": "expo-rust-demo",
+    "name": "doordash-login",
+    "slug": "doordash-login",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,14 +16,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.dgca.exporustdemo"
+      "bundleIdentifier": "com.anonymous.doordashlogin"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dgca.exporustdemo"
+      "package": "com.anonymous.doordashlogin"
     },
     "web": {
       "favicon": "./assets/favicon.png"

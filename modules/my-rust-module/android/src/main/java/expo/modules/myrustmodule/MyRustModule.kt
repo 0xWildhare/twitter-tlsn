@@ -11,7 +11,7 @@ class MyRustModule : Module() {
     }
   }
 
-  external fun rustAdd(a: Int, b: Int): Int
+  external fun rustStart(req: String): String
 
   // Each module class must implement the definition function. The definition consists of components
   // that describes the module's functionality and behavior.
@@ -35,8 +35,8 @@ class MyRustModule : Module() {
       "Hello world! 👋"
     }
 
-    AsyncFunction("rustAdd") { a: Int, b: Int ->
-      rustAdd(a, b)
+    AsyncFunction("rustStart") { req:String ->
+      rustStart(req)
     }
 
     // Defines a JavaScript function that always returns a Promise and whose native code
