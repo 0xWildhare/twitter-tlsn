@@ -11,7 +11,8 @@
     "cargo-ios": "tsx scripts/cargo-ios.ts  --target='ios-sim'",
     "cargo-android": "tsx scripts/cargo-android.ts"
   },
-"dependencies": {
+  "dependencies": {
+    "@react-native-cookies/cookies": "^6.2.1",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
     "clsx": "^2.1.0",

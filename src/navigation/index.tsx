@@ -1,5 +1,5 @@
-import {createStackNavigator} from '@react-navigation/stack';
-import {Home, Login, Profile} from '../screens';
+import { createStackNavigator } from "@react-navigation/stack";
+import { Home, Login, Profile } from "../screens";
 
 type StackParams = {
   Home: undefined;
@@ -15,13 +15,14 @@ export const StackNavigation = () => {
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
-      }}>
+      }}
+    >
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen
         name="Login"
         component={Login}
         options={{
-          presentation: 'modal',
+          presentation: "modal",
         }}
       />
       <Stack.Screen name="Profile" component={Profile} />

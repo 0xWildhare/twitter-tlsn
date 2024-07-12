@@ -1,101 +1,64 @@
-import { NavigationProp } from '@react-navigation/core';
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, SafeAreaView, Text, View } from 'react-native';
-import { Chase } from 'react-native-animated-spinkit';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { cartIdState, cartState, ordersState, profileState, searchResultsState, tokenState } from '../../atoms';
-import { addItemToCart, getCart, orderHistory, searchRestaurants, userProfile } from '../../doordash';
-import { NavParams } from '../../navigation';
-import { generateDoorDashProof, getProfileRedactStrings, notarizeDoorDashProfileRequest } from '../../doordash/notarize';
-
+import { NavigationProp } from "@react-navigation/core";
+import { StatusBar } from "expo-status-bar";
+import React, { useEffect, useMemo, useState } from "react";
+import { Pressable, SafeAreaView, Text, View } from "react-native";
+import { Chase } from "react-native-animated-spinkit";
+import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  cartIdState,
+  cartState,
+  ordersState,
+  profileState,
+  searchResultsState,
+  tokenState,
+} from "../../atoms";
+import {
+  addItemToCart,
+  getCart,
+  orderHistory,
+  searchRestaurants,
+  userProfile,
+} from "../../doordash";
+import { NavParams } from "../../navigation";
+import {
+  generateDoorDashProof,
+  getProfileRedactStrings,
+  notarizeDoorDashProfileRequest,
+} from "../../doordash/notarize";
+import {
+  cookieStringState,
+  twitterCSRFState,
+  twitterProfileState,
+} from "../../atoms/twitter.atom";
+import { getUserProfile } from "../../twitter/getUserProfile";
+import {
+  generateTwitterProof,
+  notarizeTwitterProfileRequest,
+} from "../../twitter/notarize";
 
 interface Props {
-  navigation: NavigationProp<NavParams, 'Profile'>;
+  navigation: NavigationProp<NavParams, "Profile">;
 }
 
 export const Profile = ({ navigation }: Props) => {
   const { goBack } = navigation;
 
-
-  const [search, setSearch] = useState('pizza');
-
-  const token = useRecoilValue(tokenState);
-  const [profile, setProfile] = useRecoilState(profileState);
-  const [orders, setOrders] = useRecoilState(ordersState);
-  const [searchResults, setSearchResults] = useRecoilState(searchResultsState);
-  const [cartId, setCartId] = useRecoilState(cartIdState);
-  const [cart, setCart] = useRecoilState(cartState);
-
-  const totalSpent = useMemo(() => {
-    return (
-      orders.reduce((acc, order) => {
-        return (
-          acc +
-          order.orders.reduce((acc, order) => {
-            return (
-              acc +
-              order.items.reduce((acc, item) => {
-                return acc + item.original_item_price;
-              }, 0)
-            );
-          }, 0)
-        );
-      }, 0) / 100
-    );
-  }, [orders]);
-
-
-  const numRestaurantsNearby = useMemo(() => {
-    if (!searchResults?.body.length) return 0
-
-    let count = 0
-
-    for (let i = 0; i < searchResults.body.length; i++) {
-      count += searchResults.body[i].body.length
-    }
-
-    return count
-  }, [searchResults]);
-
-
-
-
-
+  const [profile, setProfile] = useRecoilState(twitterProfileState);
+  const cookieString = useRecoilValue(cookieStringState);
+  const csrf = useRecoilValue(twitterCSRFState);
   useEffect(() => {
-    if (token) {
-      console.log('HERE', token);
-      userProfile(token).then(resp => {
-        console.log('User profile', resp);
-        setProfile(resp);
-      });
-      orderHistory(token).then(resp => {
-        console.log('Order history', resp);
-        setOrders(resp);
-      });
-      searchRestaurants(token, search).then(resp => {
-        console.log('Search results', resp);
-        setSearchResults(resp);
-      });
-      // addItemToCart(token, "24669844").then(resp => {
-      //   console.log('Add to cart results', resp);
-      //   setCartId(resp.cart.id);
-      // });
-
+    if (cookieString && csrf) {
+      console.log("HERE", cookieString);
+      getUserProfile(cookieString, csrf)
+        .then((resp) => {
+          console.log("User profile", resp);
+          setProfile(resp);
+        })
+        .catch((err) => {
+          console.log("Error getting user profile", err);
+        });
     }
-  }, [token]);
-
-  useEffect(() => {
-    if (cartId && token) {
-      getCart(token, cartId).then(resp => {
-        console.log('Cart', resp);
-        setCart(resp);
-      })
-
-    }
-  }, [cartId, token]);
-
-
+  }, [cookieString, csrf]);
 
   if (!profile) {
     return (
@@ -122,49 +85,26 @@ export const Profile = ({ navigation }: Props) => {
           <View>
             <Text className="text-xs font-medium text-gray-600">Name</Text>
             <Text className="text-lg font-light text-black">
-              {`${profile.first_name} ${profile.last_name}`}
+              {`${profile.data.viewer.user_results.result.legacy.name} ${profile.data.viewer.user_results.result.legacy.fast_followers_count}`}
             </Text>
           </View>
           <View>
-            <Text className="text-xs font-medium text-gray-600">
-              Number of orders
-            </Text>
-            <Text className="text-lg font-light text-black">
-              {orders.length}
-            </Text>
-          </View>
-          <View>
-            <Text className="text-xs font-medium text-gray-600">
-              Total spend
-            </Text>
-            <Text className="text-lg font-light text-black">
-              {`$${totalSpent.toFixed(2)}`}
-            </Text>
-          </View>
-          <View>
-            <Text className="text-xs font-medium text-gray-600">
-              Pizza restaurants nearby
-            </Text>
-            <Text className="text-lg font-light text-black">
-              {numRestaurantsNearby}
-            </Text>
-          </View>
-          <View>
-            <Text className="text-xs font-medium text-gray-600">
-              Cart total
-            </Text>
-            <Text className="text-lg font-light text-black">
-              {cart?.subtotal_monetary_fields.display_string ?? "$0"}
-            </Text>
-            {profile && token && <Pressable
-              className="h-14 w-full items-center justify-center rounded-full border border-black bg-white"
-              onPress={(async () => {
-                const request = notarizeDoorDashProfileRequest(token, getProfileRedactStrings(profile))
-                const proof = await generateDoorDashProof(request)
-                console.log('MPC-TLS Proof', proof)
-              })}>
-              <Text className="text-lg text-black">Generate proof</Text>
-            </Pressable>}
+            {profile && cookieString && (
+              <Pressable
+                className="h-14 w-full items-center justify-center rounded-full border border-black bg-white"
+                onPress={async () => {
+                  const request = notarizeTwitterProfileRequest(
+                    cookieString,
+                    csrf!,
+                    [],
+                  );
+                  const proof = await generateTwitterProof(request);
+                  console.log("MPC-TLS Proof", proof);
+                }}
+              >
+                <Text className="text-lg text-black">Generate proof</Text>
+              </Pressable>
+            )}
           </View>
         </View>
       </SafeAreaView>

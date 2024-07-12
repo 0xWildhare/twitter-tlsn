@@ -13,34 +13,33 @@ import {
 import { submitCode } from "../../doordash";
 import { NavParams } from "../../navigation";
 import { generateDoordashLoginUrl } from "../../utils";
-
+import CookieManager, { Cookies } from "@react-native-cookies/cookies";
+import {
+  cookieStringState,
+  twitterCSRFState,
+  twitterHasAuthTokenState,
+} from "../../atoms/twitter.atom";
 interface Props {
   navigation: NavigationProp<NavParams, "Profile">;
 }
 
 export const Login = ({ navigation }: Props) => {
   const { goBack } = navigation;
-  const deviceId = useRecoilValue(randomDeviceIdState);
-  const state = useRecoilValue(randomStateState);
-  const [code, setCode] = useRecoilState(codeState);
 
-  const setToken = useSetRecoilState(tokenState);
-
+  const [_, setCookieString] = useRecoilState(cookieStringState);
+  const hasAuthToken = useRecoilValue(twitterHasAuthTokenState);
+  const setCSRF = useSetRecoilState(twitterCSRFState);
   useEffect(() => {
-    if (code) {
-      submitCode(code).then((resp) => {
-        console.log("token", resp.token.token);
-        setToken(resp.token.token);
-        goBack();
-      });
+    if (hasAuthToken) {
+      goBack();
     }
-  }, [code]);
+  }, [hasAuthToken]);
 
   return (
     <View className="flex-1">
       <View className="h-12 flex-row items-center justify-between bg-black px-4">
         <View className="w-8"></View>
-        <Text className="text-white">Doordash Login</Text>
+        <Text className="text-white">X Login</Text>
         <Pressable
           className="h-8 w-8 items-end justify-center"
           onPress={goBack}
@@ -57,28 +56,24 @@ export const Login = ({ navigation }: Props) => {
         userAgent={
           "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro Build/AP1A.240305.019.A1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/125.0.6422.3 Mobile Safari/537.36"
         }
-        source={{ uri: generateDoordashLoginUrl(deviceId, state) }}
-        // onNavigationStateChange={(navState) => {
-        //   console.log('navState', navState);
-        // if (navState.url.startsWith('ios-identity-framework://')) {
-        //   console.log('request', navState.url);
-        //   const parsedUrl = parseUrl(navState.url)
-        //   const code = parsedUrl.query.code
-        //   setCode(code)
-        //   return false;
-        // }
-        // }}
-        onShouldStartLoadWithRequest={(req) => {
-          console.log("request", req.url);
+        source={{ uri: "https://x.com" }}
+        onNavigationStateChange={async (navState) => {
+          const goodCookies = [];
 
-          if (req.url.startsWith("ios-identity-framework://")) {
-            console.log("request", req.url);
-            const parsedUrl = parseUrl(req.url);
-            const code = parsedUrl.query.code;
-            setCode(code);
-            return false;
+          const cookies: Cookies = await CookieManager.getAll(true);
+          for (const key in cookies) {
+            const cookie = cookies[key];
+            if (cookie.domain === ".twitter.com") {
+              const key = cookie.name;
+              const value = cookie.value;
+              goodCookies.push(`${key}=${value}`);
+
+              if (key === "ct0") {
+                setCSRF(value);
+              }
+            }
           }
-          return true;
+          setCookieString(goodCookies.join("; "));
         }}
       />
     </View>
