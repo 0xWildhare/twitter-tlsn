@@ -1,11 +1,5 @@
 use elliptic_curve::pkcs8::DecodePrivateKey;
 use futures::{AsyncRead, AsyncWrite};
-use http_body_util::{BodyExt as _, Either, Empty, Full};
-use hyper::{client::conn::http1::Parts, Request, StatusCode};
-use hyper_util::rt::TokioIo;
-use notary_server::{ClientType, NotarizationSessionRequest, NotarizationSessionResponse};
-use rustls::{Certificate, ClientConfig, RootCertStore};
-use std::sync::Arc;
 use tlsn_verifier::tls::{Verifier, VerifierConfig};
 
 const NOTARY_KEY_STR: &str = "-----BEGIN PRIVATE KEY-----

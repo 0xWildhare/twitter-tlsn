@@ -76,7 +76,7 @@ unsafe extern "C" fn rust_start(request: *const c_char) -> *const c_char {
 }
 
 /// cbindgen:ignore
-// #[cfg(target_os = "android")]
+#[cfg(target_os = "android")]
 pub mod android {
     use crate::rust_start;
     use jni::objects::{JClass, JString};
