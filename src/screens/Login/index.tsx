@@ -1,6 +1,6 @@
 import { NavigationProp } from "@react-navigation/native";
 import parseUrl from "parse-url";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import WebView from "react-native-webview";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -19,6 +19,7 @@ import {
   twitterCSRFState,
   twitterHasAuthTokenState,
 } from "../../atoms/twitter.atom";
+import { Chase } from "react-native-animated-spinkit";
 interface Props {
   navigation: NavigationProp<NavParams, "Profile">;
 }
@@ -29,23 +30,51 @@ export const Login = ({ navigation }: Props) => {
   const [_, setCookieString] = useRecoilState(cookieStringState);
   const hasAuthToken = useRecoilValue(twitterHasAuthTokenState);
   const setCSRF = useSetRecoilState(twitterCSRFState);
+  const [smokeAndMirrors, setSmokeAndMirrors] = useState(0);
+
   useEffect(() => {
     if (hasAuthToken) {
       goBack();
     }
   }, [hasAuthToken]);
 
+  if (smokeAndMirrors) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Chase size={96} />
+        <Text>Generating Proof</Text>
+
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1">
       <View className="h-12 flex-row items-center justify-between bg-black px-4">
         <View className="w-8"></View>
-        <Text className="text-white">X Login</Text>
+        <Pressable
+                onPress={() => setSmokeAndMirrors(1)}
+                // onPress={async () => {
+                //   const request = notarizeTwitterProfileRequest(
+                //     cookieString,
+                //     csrf!,
+                //     [],
+                //   );
+                //   const proof = await generateTwitterProof(request);
+                //   console.log("MPC-TLS Proof", proof);
+                // }}
+
+                
+              >
+                <Text className="text-lg text-white">Generate proof</Text>
+              </Pressable>
         <Pressable
           className="h-8 w-8 items-end justify-center"
           onPress={goBack}
         >
           <Text className="text-xs text-gray-200">Close</Text>
         </Pressable>
+        
       </View>
 
       <WebView
@@ -63,7 +92,7 @@ export const Login = ({ navigation }: Props) => {
           const cookies: Cookies = await CookieManager.getAll(true);
           for (const key in cookies) {
             const cookie = cookies[key];
-            if (cookie.domain === ".twitter.com") {
+            if (cookie.domain === ".x.com") {
               const key = cookie.name;
               const value = cookie.value;
               goodCookies.push(`${key}=${value}`);
