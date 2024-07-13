@@ -70,6 +70,7 @@ export const Profile = ({ navigation }: Props) => {
 
   return (
     <View className="flex-1 bg-white">
+      <Text className="text-lg text-black">Generate proof</Text>
       <SafeAreaView className="flex-1">
         <StatusBar style="auto" />
 
