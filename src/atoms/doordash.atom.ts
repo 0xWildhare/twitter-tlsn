@@ -1,9 +1,9 @@
 import {atom, selector} from 'recoil';
-import {OrderInterface} from '../doordash/orderHistory';
-import {ProfileInterface} from '../doordash/userProfile';
+// import {OrderInterface} from '../doordash/orderHistory';
+// import {ProfileInterface} from '../doordash/userProfile';
 import {randomDeviceId, randomState} from '../utils';
-import { SearchResultInterface } from '../doordash/searchRestaurants';
-import { CartInterface } from '../doordash';
+// import { SearchResultInterface } from '../doordash/searchRestaurants';
+// import { CartInterface } from '../doordash';
 
 const IS_TESTING = true;
 
@@ -53,20 +53,20 @@ export const hasTokenSelector = selector<boolean>({
   get: ({get}) => !!get(tokenState),
 });
 
-export const profileState = atom<ProfileInterface | undefined>({
-  key: 'profile',
-  default: undefined,
-});
+// export const profileState = atom<ProfileInterface | undefined>({
+//   key: 'profile',
+//   default: undefined,
+// });
 
-export const ordersState = atom<OrderInterface[]>({
-  key: 'orders',
-  default: [],
-});
+// export const ordersState = atom<OrderInterface[]>({
+//   key: 'orders',
+//   default: [],
+// });
 
-export const searchResultsState = atom<SearchResultInterface|undefined>({
-  key: 'search-results',
-  default: undefined,
-});
+// export const searchResultsState = atom<SearchResultInterface|undefined>({
+//   key: 'search-results',
+//   default: undefined,
+// });
 
 
 export const cartIdState = atom<string|undefined>({
@@ -75,8 +75,8 @@ export const cartIdState = atom<string|undefined>({
 });
 
 
-export const cartState = atom<CartInterface|undefined>({
-  key: 'cart',
-  default: undefined,
-});
+// export const cartState = atom<CartInterface|undefined>({
+//   key: 'cart',
+//   default: undefined,
+// });
 
