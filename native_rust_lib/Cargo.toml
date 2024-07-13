@@ -45,6 +45,7 @@ serde = { version = "1.0.188", features = ["derive"] }
 serde_json = { version = "1.0.106", features = ["raw_value"] }
 serde_derive = "1.0.188"
 rand = "0.8.5"
+openssl = { version = "0.10", features = ["vendored"] }
 
 [lib]
 crate-type = ["staticlib", "cdylib"]

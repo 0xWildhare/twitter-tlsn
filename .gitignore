@@ -40,3 +40,6 @@ native_rust_lib/**/*.h
 modules/**/*.h
 modules/**/*.a
 modules/**/*.so
+
+#android build
+*.transforms/
